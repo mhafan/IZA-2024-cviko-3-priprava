@@ -8,25 +8,45 @@
 import SwiftUI
 import SwiftData
 
-@main
-struct IZA_2024_cviko_3_pripravaApp: App {
-    var sharedModelContainer: ModelContainer = {
+// ----------------------------------------------------------------------------
+// main() Aplikace
+@main struct MojeSwiftDataAPP: App {
+    // ------------------------------------------------------------------------
+    // Zavedeni SwiftData stacku
+    // ------------------------------------------------------------------------
+    // singleton MojeSwiftDataAPP.sharedModelContainer
+    static let sharedModelContainer: ModelContainer = {
+        // --------------------------------------------------------------------
+        // DB schema tvoreny tridami @Model
         let schema = Schema([
-            Item.self,
+            Notebook.self,
+            Note.self
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        
+        // --------------------------------------------------------------------
+        // Inicializace stacku <- schema
+        let modelConfiguration = ModelConfiguration(schema: schema,
+                                                    isStoredInMemoryOnly: false)
 
+        //
         do {
+            //
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
+            // stack typicky nejde inicializovat po vyznamne zmene schematu
+            // pak:
+            // 1) smazat aplikaci v zarizeni + nova instalace
+            // 2) pokrocilejsi techniky aktualizace DB schematu, verzovani
             fatalError("Could not create ModelContainer: \(error)")
         }
     }()
 
+    // ------------------------------------------------------------------------
+    //
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(MojeSwiftDataAPP.sharedModelContainer)
     }
 }
